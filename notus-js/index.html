@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+    <title>Dashboard | Mental Health Score</title>
+    <style>
+        body {
+            background-color: #000000; /* Cor de fundo */
+            color: white; /* Cor do texto */
+            font-family: Arial, sans-serif; /* Fonte */
+            text-align: center; /* Centraliza o texto */
+            padding: 50px; /* Espaçamento interno */
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Altura desejada */
+            width: 100%; /* Largura total */
+        }
+    </style>
+</head>
+<body>
+    <h2>Mental Health Score vs App Usage Time</h2>
+    <div class="chart-container">
+        <canvas id="line-chart"></canvas>
+    </div>
+
+    <h2>Mental Health Score Zoom</h2>
+    <div class="chart-container">
+        <canvas id="mental-health-zoom"></canvas>
+        <h6>as the app usage grows, the mental health lowers</h6>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-regression"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-regression"></script>
+    <script type="text/javascript">
+        (function () {
+            /* Dados fornecidos */
+            const appUsageTime = [
+                0.187432, 7.384105, 12.617860, 13.666950, 13.749350, 28.078496,
+                28.452198, 30.859393, 30.877405, 33.340627, 36.569778, 38.259495,
+                39.208707, 41.641819, 42.840007, 44.134094, 45.733424, 52.515795,
+                56.307336, 61.959417, 64.922381, 66.035666, 69.487736, 69.910230,
+                73.085842, 73.826320, 79.791792, 82.315093, 86.273256, 86.747921,
+                95.454302, 96.111973, 98.376216, 103.054942, 105.539373, 110.653635,
+                112.338833, 113.944961, 115.190891, 122.693077, 124.117298, 124.363901,
+                125.294034, 130.467822, 131.949506, 132.660022, 134.554902, 136.000247,
+                136.984421, 139.788735, 140.033712, 142.594972, 143.338791, 153.451638,
+                158.431646, 163.219807, 165.430504, 168.284395, 171.790021, 178.242606,
+                183.831301, 188.766339, 192.152044, 195.930578, 196.711740, 197.027438,
+                199.534558, 200.416676, 203.271191, 207.211584, 207.841022, 212.559140,
+                213.054720, 225.992359, 226.342548, 227.537861, 234.688290, 236.458750,
+                236.491541, 238.302696, 238.640225, 239.677454, 243.019306, 243.716853,
+                244.392012, 257.348315, 264.905221, 265.940718, 266.861795,
+                267.725713, 267.915334, 268.513608, 269.947491, 270.689714,                 282.140185, 286.351095, 287.050004, 288.907270, 295.487094,
+                298.280933
+            ];
+
+            const mentalHealthScore = [
+                7.368156, 2.510160, 5.221568, 5.626023, 6.330098, 3.726420,                 
+                3.012537, 4.546750, 5.681196, 4.286885, 2.730970, 5.278795,
+                4.036945, 3.162579, 4.636891, 4.998713, 3.926652, 5.206331,
+                6.396811, 3.889588, 6.098792, 3.758057, 2.874401, 2.255544,
+                4.455977, 4.753530, 5.837280, 7.365182, 4.089560, 2.463864,
+                7.848569, 4.501141, 3.906746, 6.051506, 6.060571, 2.036881,
+                3.279391, 4.154503, 3.689800, 4.219147, 1.459257, 3.966227,
+                4.775221, 4.246694, 4.166025, 5.261624, 4.899291, 4.511651,
+                4.360281, 3.917990, 2.845874, 4.263518, 6.110853, 3.533121,
+                4.958410, 3.697993, 3.851843, 3.213837, 5.787619, 3.351093,
+                4.899988, 3.616779, 3.432603, 3.639762, 5.952329, 3.964617,
+                5.559610, 5.200530, 1.564279, 5.060230, 3.011987, 5.300708,
+                5.556865, 3.278240, 4.674539, 4.004776, 4.821207, 2.929541,
+                4.255354, 4.755100, 4.788736, 4.495930, 5.857573, 3.179528,
+                3.649479, 3.909375, 5.515879, 6.493618, 5.061327, 3.158263,
+                4.778509, 5.311277, 3.728036, 6.125686, 3.497089, 3.189402,
+                5.230552, 6.302320, 4.905018, 3.403211
+            ];
+
+            // Função para downsample os dados
+            function downsample(data, factor) {
+                return data.filter((_, index) => index % factor === 0);
+            }
+
+            // Defina o fator de downsampling
+            const downsampleFactor = 5; // Exibir 1 ponto a cada 5
+
+            const downsampledAppUsageTime = downsample(appUsageTime, downsampleFactor);
+            const downsampledMentalHealthScore = downsample(mentalHealthScore, downsampleFactor);
+
+            /* Configuração do gráfico principal (Mental Health Score vs App Usage Time) */
+            var config = {
+                type: "line",
+                data: {
+                    labels: appUsageTime.map((_, index) => index + 1), // Usando índices como rótulos
+                    datasets: [
+                        {
+                            label: "Mental Health Score",
+                            backgroundColor: "#4c51bf",
+                            borderColor: "#4c51bf",
+                            data: mentalHealthScore,
+                            fill: false,
+                            regressions: {
+                                type: 'linear', // Tipo de regressão
+                                line: { color: 'red', width: 2 } // Configuração da linha
+                            }
+                        },
+                        {
+                            label: "App Usage Time",
+                            backgroundColor: "#ed64a6",
+                            borderColor: "#ed64a6",
+                            data: appUsageTime,
+                            fill: false,
+                            regressions: {
+                                type: 'linear', // Tipo de regressão
+				                                    line: { color: 'blue', width: 2 } // Configuração da linha
+                            }
+                        },
+                    ],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "Mental Health Score vs App Usage Time",
+                        fontColor: "white",
+                    },
+                    legend: {
+                        labels: {
+                            fontColor: "white",
+                        },
+                        align: "end",
+                        position: "bottom",
+                    },
+                    tooltips: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: "nearest",
+                        intersect: true,
+                    },
+                    scales: {
+                        xAxes: [
+                            {
+                                ticks: {
+                                    fontColor: "rgba(255,255,255,.7)",
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "Index",
+                                    fontColor: "white",
+                                },
+                                gridLines: {
+                                    display: false,
+                                },
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                ticks: {
+                                    fontColor: "rgba(255,255,255,.7)",
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "Score / Time",
+                                    fontColor: "white",
+                                },
+                                gridLines: {
+                                    color: "rgba(255, 255, 255, 0.15)",
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+
+            var ctx = document.getElementById("line-chart").getContext("2d");
+            window.myLine = new Chart(ctx, config);
+
+            /* Configuração do gráfico de zoom (apenas Mental Health Score) */
+            var zoomConfig = {
+                type: "line",
+                data: {
+                    labels: downsampledMentalHealthScore.map((_, index) => index + 1), // Usando índices como rótulos
+                    datasets: [
+                        {
+                            label: "Mental Health Score (Zoom)",
+                            backgroundColor: "#4c51bf",
+                            borderColor: "#4c51bf",
+                            data: downsampledMentalHealthScore,
+                            fill: false,
+                            regressions: {
+                                type: 'linear', // Tipo de regressão
+                                line: { color: 'red', width: 2 } // Configuração da linha de regressão
+                            }
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "Simplified, with linear regression",
+                        fontColor: "white",
+                    },
+                    legend: {
+                        labels: {
+                            fontColor: "white",
+                        },
+                        align: "end",
+                        position: "bottom",
+                    },
+                    scales: {
+                        xAxes: [
+                            {
+                                ticks: {
+                                    fontColor: "rgba(255,255,255,.7)",
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "Index",
+                                    fontColor: "white",
+                                },
+                                gridLines: {
+                                    display: false,
+                                },
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                ticks: {
+                                    fontColor: "rgba(255,255,255,.7)",
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "Mental Health Score",
+                                    fontColor: "white",
+                                },
+                                gridLines: {
+                                    color: "rgba(255, 255, 255, 0.15)",
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+
+            var zoomCtx = document.getElementById("mental-health-zoom").getContext("2d");
+            window.myZoomLine = new Chart(zoomCtx, zoomConfig);
+
+        })();
+    </script>
+            <canvas id=""></canvas>
+</body>
+</html>
