@@ -31,6 +31,8 @@ The dataset used in this analysis includes user behavior data related to mobile 
 
 ### Health Score Classification
 
+which use this sheet metric https://www.webmd.com/mental-health/gaf-scale-facts as classificatory means
+
 The health scores are transformed from a range of 0-100 to a range of 0-10, with classifications as follows:
 
 | Original Range (0-100) | Transformed Range (0-10) | Classification   |
