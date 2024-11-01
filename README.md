@@ -4,6 +4,14 @@
 
 This repository contains a Jupyter Notebook for analyzing the relationship between mobile app usage and mental health. The analysis leverages machine learning techniques to uncover patterns and insights from the data, providing valuable information for understanding how app usage affects mental well-being.
 
+## Graphs
+![image](https://github.com/user-attachments/assets/9181ab91-b291-483e-a86f-80760356b75c)
+![image](https://github.com/user-attachments/assets/3a0cf191-9c8f-4a2e-a23b-c91e61c397db)
+
+
+
+
+
 ## Contents
 
 - **app_usage_mental_health_analysis.ipynb**: The main Jupyter Notebook containing the analysis, visualizations, and machine learning models.
