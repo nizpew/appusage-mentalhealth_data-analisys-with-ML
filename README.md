@@ -50,7 +50,7 @@ The health scores are transformed from a range of 0-100 to a range of 0-10, with
 
 ## Installation
 
-To run the Jupyter Notebook, you will need to have Python and Jupyter installed. You can set up your environment as follows:
+To run the Jupyter Notebook, you will need to have R and Jupyter installed. You can set up your environment as follows:
 
 1. Clone this repository:
    ```bash
