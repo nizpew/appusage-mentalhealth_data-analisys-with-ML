@@ -6,8 +6,7 @@ This repository contains a Jupyter Notebook for analyzing the relationship betwe
 
 ## Graphs
 ![image](https://github.com/user-attachments/assets/9181ab91-b291-483e-a86f-80760356b75c)
-![image](https://github.com/user-attachments/assets/3a0cf191-9c8f-4a2e-a23b-c91e61c397db)
-
+![image](https://github.com/user-attachments/assets/37d3487a-9978-4a04-a4da-3fbfb41cbacd)
 
 
 
