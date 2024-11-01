@@ -63,3 +63,12 @@ To run the Jupyter Notebook, you will need to have R and Jupyter installed. You 
    ```bash
    git clone https://github.com/yourusername/appusage-mentalhealth_data-analysis-with-ML.git
    cd appusage-mentalhealth_data-analysis-with-ML
+   ```
+2. upload csv file to the collab notebook:
+3. run all cells
+4. See the graphs in appusage-mentalhealth_data-analisys-with-ML/notus-js/index.html in a browser
+
+
+
+
+   
